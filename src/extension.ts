@@ -21,6 +21,14 @@ export function activate(context: vscode.ExtensionContext) {
 		Metadata.Logger = logger;
 		Metadata.ExtensionContext = context;
 		// code that imports the Metadata class can access its static properties
+
+		// todo decide whether to activate basic preview support
+		// provided by the Print extension, by defining a command here
+		// and surfacing it in package.json
+		context.subscriptions.push(vscode.commands.registerCommand("svg-print-demo.preview", () => {
+			logger.debug("SVG Preview command was invoked");
+			vscode.commands.executeCommand("vsc-print.preview");
+		}));
 	});
 }
 

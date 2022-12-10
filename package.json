@@ -26,7 +26,8 @@
 		"commands": [
 			{
 				"command": "svg-print-demo.preview",
-				"title": "SVG preview"
+				"title": "SVG preview",
+				"enablement": "editorLangId == svg"
 			}
 		],
 		"configuration": [
