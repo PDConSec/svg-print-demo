@@ -1,8 +1,8 @@
 {
-	"name": "svg-print-demo",
-	"displayName": "SVG Print Demo",
-	"description": "A demonstration of how to write a preview extension that can print.",
-	"version": "0.0.5",
+	"name": "vscode-print-browser-agent",
+	"displayName": "Print browser agent",
+	"description": "Workstation browser launch for remoted Print.",
+	"version": "0.0.6",
 	"author": {
 		"name": "Peter Wone",
 		"email": "peter.wone@outlook.com"
@@ -10,7 +10,7 @@
 	"publisher": "pdconsec",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/PDConSec/svg-print-demo"
+		"url": "https://github.com/PDConSec/vsc-print-browser-agent"
 	},
 	"engines": {
 		"vscode": "^1.46.0"
@@ -19,44 +19,23 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onLanguage:svg"
+		"onCommand:print.launchBrowser"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
-		"commands": [
-			{
-				"command": "svg-print-demo.preview",
-				"title": "SVG preview",
-				"enablement": "editorLangId == svg"
-			}
-		],
 		"configuration": [
 			{
 				"title": "Printing",
 				"properties": {
-					"print.renderSvg": {
-						"type": "boolean",
-						"default": true,
-						"description": "Print the image instead of the code."
+					"print.launchUrlWithDefaultBrowserOnLinux": {
+						"type": "string",
+						"default": "gio open",
+						"description": "Supply the Linux bash command required to launch a URL with default browser"
 					}
 				}
 			}
-		],
-		"languages": [
-			{
-				"id": "svg",
-				"extensions": [
-					".svg"
-				],
-				"aliases": [
-					"Scalable Vector Graphics"
-				]
-			}
 		]
 	},
-	"extensionDependencies": [
-		"pdconsec.vscode-print"
-	],
 	"scripts": {
 		"vscode:prepublish": "webpack --mode production",
 		"webpack": "webpack --mode development",

@@ -1,34 +1,37 @@
-import { Metadata } from './metadata';
 import * as vscode from 'vscode';
-import * as htmlRendererSvg from "./html-renderer-svg";
-import { Logger } from "winston";
+import * as child_process from "child_process";
 
 export function activate(context: vscode.ExtensionContext) {
-	// todo register for your own languageId, passing only the callbacks that you implement
-	// in some cases you may need to define a new language in package.json
-	// todo remove the registration of SVG language from package.json
-	vscode.commands.executeCommand<Logger>(
-		"print.registerDocumentRenderer", "svg",
-		{
-			getBodyHtml: htmlRendererSvg.getBodyHtml,
-			getCssUriStrings: htmlRendererSvg.getCssUriStrings,
-			getResource: htmlRendererSvg.getResource
-		}
-	).then(logger => {
-		// todo remove or update this log info
-		logger.info("SVG is registered for printing services.");
-		// capture the Print logger for use elsewhere
-		Metadata.Logger = logger;
-		Metadata.ExtensionContext = context;
-		// code that imports the Metadata class can access its static properties
-
-		// todo decide whether to activate basic preview support
-		// provided by the Print extension, by defining a command here
-		// and surfacing it in package.json
-		context.subscriptions.push(vscode.commands.registerCommand("svg-print-demo.preview", () => {
-			logger.debug("SVG Preview command was invoked");
-			vscode.commands.executeCommand("vsc-print.preview");
-		}));
-	});
+	context.subscriptions.push(vscode.commands.registerCommand("print.launchBrowser", url => {
+		const cmd = getLaunchBrowserCommand();
+		child_process.exec(`${cmd} ${url}`, (error: child_process.ExecException | null, stdout: string, stderr: string) => {
+			if (error || stderr) {
+				vscode.window.showErrorMessage(error ? error.message : stderr);
+			}
+		});
+	}));
+	vscode.window.showInformationMessage("Print browser agent activated");
 }
 
+	const browserLaunchMap: any = {
+		darwin: "open",
+		linux: () => {
+			return vscode.workspace.getConfiguration("print").launchUrlWithDefaultBrowserOnLinux;
+		},
+		win32: "start"
+};
+	
+function getLaunchBrowserCommand(): string {
+	const printConfig = vscode.workspace.getConfiguration("print");
+	const cmd = printConfig.alternateBrowser && printConfig.browserPath ? escapePath(printConfig.browserPath) : browserLaunchMap[process.platform];
+	return cmd;
+}
+
+function escapePath(path: string) {
+	switch (process.platform) {
+		case "win32":
+			return path.includes('"') || !path.includes(" ") ? path : `"${path}"`;
+		default:
+			return path.replace(/ /g, "\\ ");
+	}
+}
